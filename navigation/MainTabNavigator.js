@@ -4,7 +4,7 @@ import { createStackNavigator, createBottomTabNavigator } from 'react-navigation
 
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
-import LinksScreen from '../screens/LinksScreen';
+import CategoriesScreen from '../screens/CategoriesScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import CartScreen from '../screens/CartScreen';
 
@@ -45,12 +45,12 @@ CartStack.navigationOptions = {
   ),
 };
 
-const LinksStack = createStackNavigator({
-  Links: LinksScreen,
+const CategoriesStack = createStackNavigator({
+  Categories: CategoriesScreen,
 });
 
-LinksStack.navigationOptions = {
-  tabBarLabel: 'Links',
+CategoriesStack.navigationOptions = {
+  tabBarLabel: 'Categories',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -76,6 +76,6 @@ SettingsStack.navigationOptions = {
 export default createBottomTabNavigator({
   HomeStack,
   CategoriesStack,
-  SettingsStack,
-  CartStack
+  CartStack,
+  SettingsStack
 });
