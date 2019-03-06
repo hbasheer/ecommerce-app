@@ -11,4 +11,6 @@ export default {
   warningText: '#666804',
   noticeBackground: tintColor,
   noticeText: '#fff',
+  navbarBackgroundColor: '#2c3e50',
+  statusBarColor: '#233240'
 };
