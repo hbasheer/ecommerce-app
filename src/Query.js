@@ -22,4 +22,19 @@ const ProductsQuery = gql`
   	
   }`
 
-export { CategoriesQuery, ProductsQuery };
+const SingInMutation = gql`
+  mutation signin($email: String!, $password: String!) {
+    signin(attributes: {email: $email , password: $password}){
+	  user {
+	    id
+	    email
+	    fullname
+	    address
+	    createdAt
+	    token 
+	  }
+    }
+  }
+`
+
+export { CategoriesQuery, ProductsQuery, SingInMutation };

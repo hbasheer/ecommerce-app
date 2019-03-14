@@ -22,6 +22,13 @@ const items = [
 export default class CartScreen extends React.Component {
   static navigationOptions = {
     title: 'سلة المشتريات',
+    headerStyle: {
+      backgroundColor: '#2f95dc',
+    },
+    headerTintColor: '#fff',
+    headerTitleStyle: {
+      fontWeight: 'bold',
+    },
   };
 
   constructor(props) {
@@ -174,7 +181,6 @@ export default class CartScreen extends React.Component {
 
 const styles={
   title: {
-
     fontWeight: '100'
   }
 };

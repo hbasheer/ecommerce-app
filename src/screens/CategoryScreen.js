@@ -23,7 +23,14 @@ export default class CategoryScreen extends React.Component {
   }
 
   static navigationOptions = ({ navigation }) => ({
-    title: navigation.state.params.item.arName
+    title: navigation.state.params.item.arName,
+    headerStyle: {
+      backgroundColor: '#2f95dc',
+    },
+    headerTintColor: '#fff',
+    headerTitleStyle: {
+      fontWeight: 'bold',
+    },
   });
 
   render() {
