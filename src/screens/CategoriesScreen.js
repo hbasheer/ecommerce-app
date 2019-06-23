@@ -49,7 +49,7 @@ export default class CategoriesScreen extends React.Component {
                     <View style={{ width: "100%", height: 150, flexDirection: 'row' }}>
                       <Image
                         style={styles.categoryImage}
-                        source={{ uri: 'https://www.dike.lib.ia.us/images/sample-1.jpg/image' }}
+                        source={{ uri: item.imageUrl }}
                       />
                       <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)', alignSelf: 'flex-end' }}>
                         <Text style={styles.categoryName}>{item.arName}</Text>

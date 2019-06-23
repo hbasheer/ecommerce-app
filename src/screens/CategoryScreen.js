@@ -1,24 +1,26 @@
-import React from 'react';
-import { 
-  ScrollView, 
-  StyleSheet, 
-  Text, 
-  View, 
-  ActivityIndicator, 
+import React, { Component } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
   Image,
-  TouchableOpacity
+  Alert,
+  ScrollView,
+  ActivityIndicator,
+  FlatList,
+  AsyncStorage
 } from 'react-native';
-import { FlatGrid } from 'react-native-super-grid';
-
+import {Icon} from 'expo';
 import { Query } from "react-apollo";
 import { ProductsQuery} from ".././Query";
-import { Container, Header, Content, Card, CardItem, Thumbnail, Button, Icon, Left, Body, Right } from 'native-base';
 
 export default class CategoryScreen extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      category: props.navigation.state.params.item
+      category: props.navigation.state.params.item,
+      cartItems: []
     }
   }
 
@@ -33,81 +35,192 @@ export default class CategoryScreen extends React.Component {
     },
   });
 
+  async getCartItems() {
+    await AsyncStorage.getItem("CART", (err, res) => {
+      if (!res) this.setState({cartItems: []});
+      else this.setState({cartItems: JSON.parse(res)});
+    });
+  }
+
+   addItemToCart(product){
+      // Get current list of products
+      this.getCartItems();
+      let products = this.state.cartItems
+      let idx = this.state.cartItems.indexOf(product)
+      
+      if (this.state.cartItems.indexOf(product) !== -1) {
+        products[idx].quantity += 1;
+      } else {
+        let new_product = Object.assign(product, {quantity: 1});
+        products.push(new_product);
+      }
+      
+      // Update the state
+      this.setState({
+        cartItems: products,
+      })
+      AsyncStorage.setItem("CART", JSON.stringify(products));
+      AsyncStorage.setItem("CART_ITEMS", JSON.stringify(products.length));
+      Alert.alert('تنبيه!', 'تم إضافة المنتج للسلة بنجاح');
+    }
+
   render() {
     const categoryId = this.state.category ? this.state.category.id : null;
-
     return (
-      <Container >
-        <Content >
-          <Query query={ProductsQuery} variables={{id: categoryId }} >
-            {({ loading, error, data }) => {
-              if (loading) {
-                  return  <ActivityIndicator size="large" color="#0000ff" />
-              }
-              if (error) {
-                return <Text>{error}</Text>;
-              }
-              return(
-                <FlatGrid
-                  itemDimension={130}
-                  items={data.products}
-                  renderItem={({ item, index }) => (
-                    <TouchableOpacity 
-                      style={[styles.productContainer]}
-                      onPress={() => this.props.navigation.navigate('HomeStack')}
-                    >
-                      <Card>
-                        <CardItem cardBody>
-                          <Image source={{uri: item.imageUrl }} style={styles.productImage}/>
-                        </CardItem>
-                        <CardItem>
-                          <Body>
-                            <Text> {item.arName} </Text>
-                            <Text> {item.price} IQD </Text>
-                          </Body>
-                        </CardItem>
-                      </Card>
+      <View style={styles.container}>
+        <Query query={ProductsQuery} variables={{id: categoryId }} >
+          {({ loading, error, data }) => {
+            if (loading) {
+                return  <ActivityIndicator size="large" color="#0000ff" />
+            }
+            if (error) {
+              return <Text>{error}</Text>;
+            }
 
-                    </TouchableOpacity>
-                  )}
-                />
-              )
+          return(
+            <FlatList style={styles.list}
+              contentContainerStyle={styles.listContainer}
+              data={data.products}
+              horizontal={false}
+              numColumns={2}
+              keyExtractor= {(item) => {
+                return item.id;
+              }}
+              ItemSeparatorComponent={() => {
+                return (
+                  <View style={styles.separator}/>
+                )
+              }}
+              renderItem={(product) => {
+                const item = product.item;
+                return (
+                  <View style={styles.card}>
+                   <View style={styles.cardHeader}>
+                      <View style={styles.row}>
+                        <Text style={styles.title}>{item.arName}</Text>
+                      </View>
+                      <View style={styles.row}>
+                        <Text style={styles.price}>{item.price} IQD</Text>
+                      </View>
+                    </View>
 
-            }}
-          </Query>
-        </Content>
-      </Container>
+                    <Image style={styles.cardImage} source={{uri:item.imageUrl}}/>
+                    
+                    <View style={styles.cardFooter}>
+                      <View style={styles.buttonContainer}>
+                        <TouchableOpacity style={styles.socialBarButton} onPress={() => this.addItemToCart(item)}>
+                          <Image style={styles.icon} source={{uri: 'https://png.icons8.com/nolan/96/3498db/add-shopping-cart.png'}}/>
+                          <Text style={[styles.socialBarLabel, styles.addToCart]}>أضف إلى السلة</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+                )
+              }}
+            />
+          )
+          }}
+        </Query>
+      </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  container: {
+  container:{
+    flex:1,
+  },
+  list: {
+    paddingHorizontal: 5,
+  },
+  listContainer:{
+    alignItems:'center'
+  },
+  separator: {
+    marginTop: 5,
+  },
+  /******** card **************/
+  card:{
+    shadowColor: '#00000021',
+    shadowOffset: {
+      width: 2
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    marginVertical: 5,
+    backgroundColor:"white",
+    flexBasis: '47%',
+    marginHorizontal: 5,
+    borderColor: "#e3e3e3",
+    borderWidth: 1
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  cardHeader: {
+    paddingVertical: 12.5,
+    paddingHorizontal: 12.5,
+    borderTopLeftRadius: 1,
+    borderTopRightRadius: 1,
     flex: 1,
-    paddingTop: 5,
-    backgroundColor: '#fff',
+    justifyContent: 'center',
   },
-    header: {
-    fontSize: 12,
+  cardContent: {
+    paddingVertical: 12.5,
+    paddingHorizontal: 12.5,
   },
-  gridView: {
+  cardFooter:{
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingTop: 12.5,
+    paddingBottom: 12.5,
+    paddingHorizontal: 10,
+    borderTopColor: "#e3e3e3",
+    borderTopWidth: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  cardImage:{
     flex: 1,
+    height: 150,
+    width: null,
   },
-  productContainer: {
-    justifyContent: 'flex-end',
-    borderRadius: 5,
-
+  /******** card components **************/
+  title:{
+    fontSize:14,
   },
-  categoryName: {
-    fontSize: 18,
-    color: '#fff',
-    fontWeight: '600',
-    padding: 5,
-    backgroundColor: 'rgba(0,0,0,0.5)'
+  price:{
+    fontSize:16,
+    color: "green",
+    marginTop: 5,
+    fontWeight: "bold",
   },
-  productImage: {
-    height: 150, 
-    width: null, 
+  addToCart:{
+    color: "#2f95dc",
+  },
+  icon: {
+    width:25,
+    height:25,
+  },
+  /******** button Container ******************/
+  buttonContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
     flex: 1
+  },
+  socialBarSection: {
+    justifyContent: 'center',
+    flexDirection: 'row',
+    flex: 1,
+  },
+  socialBarlabel: {
+    alignSelf: 'flex-end',
+    justifyContent: 'center',
+  },
+  socialBarButton:{
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   }
-});
+});   

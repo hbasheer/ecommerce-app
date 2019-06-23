@@ -11,7 +11,7 @@ const AuthStack = createStackNavigator(
   {
     SignIn: SignInScreen,
     SignUp: SignUpScreen,
-    //ResetPassword: ResetPasswordScreen
+    ResetPassword: ResetPasswordScreen
   },
   {
     initialRouteName: "SignIn"

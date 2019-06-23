@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Content, View, Left, Right, Text, Button, Icon, Item, Input } from 'native-base';
+import { Container, Body, Label, Content, View, Left, Right, Text, Button, Icon, Card, CardItem, Form, Item, Input } from 'native-base';
 import { TouchableOpacity, ActivityIndicator, AsyncStorage } from 'react-native';
 import { Mutation } from "react-apollo";
 import { SingInMutation } from "../../Query"
@@ -31,7 +31,6 @@ export default class Login extends Component {
   };
 
   login = result => {
-    console.log(result.data.signin.user.token)
     AsyncStorage.setItem("TOKEN", result.data.signin.user.token)
     this.props.navigation.navigate('HomeStack')
   };
@@ -46,15 +45,43 @@ export default class Login extends Component {
               <Text style={styles.title}> أهلا بك </Text>
               <Text style={styles.details}>فضلا سجل دخول لكي تتمكن من المتابعة </Text>
             </View>
-            <Item>
-                <Input placeholder='البريد الالكتروني' onChangeText={(text) => this.setState({email: text})} placeholderTextColor="#687373" />
-                <Icon active name='ios-person' style={styles.icon}  />
-            </Item>
-            <Item>
-                <Input placeholder='كلمة المرور' onChangeText={(text) => this.setState({password: text})} secureTextEntry={true} placeholderTextColor="#687373" />
-                <Icon active name='ios-lock' style={styles.icon} />
-            </Item>
-            
+            <Card>
+              <Form>
+                <CardItem>
+                  <Body>
+                    <Item floatingLabel>
+                        <Icon active name='md-mail' />
+                        <Label>البريد الالكتروني</Label>
+                        <Input
+                          text={this.state.email}
+                          onChangeText={text => {
+                            this.setState({
+                              email: text
+                            });
+                          }}
+                        />
+                    </Item>
+                  </Body>
+                </CardItem>
+                <CardItem>
+                  <Body>
+                    <Item floatingLabel>
+                        <Icon active name='ios-lock' />
+                        <Label>كلمة المرور</Label>
+                        <Input
+                          secureTextEntry={true}
+                          text={this.state.password}
+                          onChangeText={text => {
+                            this.setState({
+                              password: text
+                            });
+                          }}
+                        />
+                    </Item>
+                  </Body>
+                </CardItem>
+              </Form>
+            </Card>
             {this.state.hasError && this.state.errors &&  !loading? this.state.errors.map(({ message }, i) => (<Text key={i} style={{color: "#c0392b", textAlign: 'center', marginTop: 10}}>{message}</Text>))
               :null
             }
@@ -79,17 +106,17 @@ export default class Login extends Component {
                 <Icon active name='md-log-in' right />
                 <Text>سجل دخول</Text>
               </Button>
-              <Button block style={{backgroundColor: Colors.navbarBackgroundColor, marginTop: 20, backgroundColor: '#2f95dc'}}>
+              <Button block style={{ marginTop: 20}}>
                 <Icon active name='logo-facebook' />
                 <Text>سجل عبر الفيسبوك</Text>
               </Button>
             </View>
             <View style={styles.marginTop}>
               <TouchableOpacity onPress={() => this.props.navigation.navigate('SignUp')}>
-                  <Text style={styles.link}>حساب جديد</Text>
+                <Text style={styles.link}>حساب جديد</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => this.props.navigation.navigate('HomeStack')}>
-                 <Text style={styles.link}>نسيت كلمة المرور ؟</Text>
+              <TouchableOpacity onPress={() => this.props.navigation.navigate('Home')}>
+                <Text style={styles.link}>نسيت كلمة المرور ؟</Text>
               </TouchableOpacity>
             </View>
           </Content>
@@ -134,13 +161,11 @@ const styles= {
     marginTop: 20
   },
   button: {
-   backgroundColor: Colors.navbarBackgroundColor,
    marginTop: 20, 
-   backgroundColor: '#2f95dc'
  },
  link: {
   marginBottom: 10, 
   color: '#2f95dc'
-}
+ }
 
 };

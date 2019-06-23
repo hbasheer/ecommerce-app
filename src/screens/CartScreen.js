@@ -4,21 +4,8 @@ import { Container, Content, View, Header, Button, Left, Right, Body, Title, Lis
 import Text from '../components/Text';
 import Navbar from '../components/Navbar';
 import {Icon} from 'expo';
-
-const items = [
-  {id: 1, quantity:1, title: 'Black Hat', categoryId: 5, categoryTitle: 'MEN', price: '2200',quantity: 5, image: 'http://res.cloudinary.com/atf19/image/upload/c_crop,h_250,w_358,x_150/v1500465309/pexels-photo-206470_nwtgor.jpg', description: "Hello there, i'm a cool product with a heart of gold."},
-  {id: 2, quantity:3, title: 'V Neck T-Shirt', categoryId: 2, categoryTitle: 'WOMEN', price: '12$',quantity: 2, image: 'http://res.cloudinary.com/atf19/image/upload/c_crop,h_250,x_226,y_54/v1500465309/pexels-photo-521197_hg8kak.jpg', description: "Hello there, i'm a cool product with a heart of gold."},
-  {id: 10, quantity:1, title: 'Black Leather Hat', categoryId: 1, categoryTitle: 'KIDS', price: '2$',quantity: 1, image: 'http://res.cloudinary.com/atf19/image/upload/c_crop,g_face,h_250,x_248/v1500465308/fashion-men-s-individuality-black-and-white-157675_wnctss.jpg', description: "Hello there, i'm a cool product with a heart of gold."},
-  {id: 9, quantity:1, title: 'Black Leather Hat', categoryId: 1, categoryTitle: 'KIDS', price: '2$',quantity: 1, image: 'http://res.cloudinary.com/atf19/image/upload/c_crop,g_face,h_250,x_248/v1500465308/fashion-men-s-individuality-black-and-white-157675_wnctss.jpg', description: "Hello there, i'm a cool product with a heart of gold."},
-  {id: 8, quantity:1, title: 'Black Leather Hat', categoryId: 1, categoryTitle: 'KIDS', price: '2$',quantity: 1, image: 'http://res.cloudinary.com/atf19/image/upload/c_crop,g_face,h_250,x_248/v1500465308/fashion-men-s-individuality-black-and-white-157675_wnctss.jpg', description: "Hello there, i'm a cool product with a heart of gold."},
-  {id: 7, quantity:1, title: 'Black Leather Hat', categoryId: 1, categoryTitle: 'KIDS', price: '2$',quantity: 1, image: 'http://res.cloudinary.com/atf19/image/upload/c_crop,g_face,h_250,x_248/v1500465308/fashion-men-s-individuality-black-and-white-157675_wnctss.jpg', description: "Hello there, i'm a cool product with a heart of gold."},
-  {id: 6, quantity:1, title: 'Black Leather Hat', categoryId: 1, categoryTitle: 'KIDS', price: '2$',quantity: 1, image: 'http://res.cloudinary.com/atf19/image/upload/c_crop,g_face,h_250,x_248/v1500465308/fashion-men-s-individuality-black-and-white-157675_wnctss.jpg', description: "Hello there, i'm a cool product with a heart of gold."},
-  {id: 5, quantity:1, title: 'Black Leather Hat', categoryId: 1, categoryTitle: 'KIDS', price: '2$',quantity: 1, image: 'http://res.cloudinary.com/atf19/image/upload/c_crop,g_face,h_250,x_248/v1500465308/fashion-men-s-individuality-black-and-white-157675_wnctss.jpg', description: "Hello there, i'm a cool product with a heart of gold."},
-  {id: 4, quantity:1, title: 'Black Leather Hat', categoryId: 1, categoryTitle: 'KIDS', price: '2$',quantity: 1, image: 'http://res.cloudinary.com/atf19/image/upload/c_crop,g_face,h_250,x_248/v1500465308/fashion-men-s-individuality-black-and-white-157675_wnctss.jpg', description: "Hello there, i'm a cool product with a heart of gold."},
-  {id: 3, quantity:1, title: 'Black Leather Hat', categoryId: 1, categoryTitle: 'KIDS', price: '2$',quantity: 1, image: 'http://res.cloudinary.com/atf19/image/upload/c_crop,g_face,h_250,x_248/v1500465308/fashion-men-s-individuality-black-and-white-157675_wnctss.jpg', description: "Hello there, i'm a cool product with a heart of gold."},
-  {id: 11, quantity:1, title: 'Black Leather Hat', categoryId: 1, categoryTitle: 'KIDS', price: '2$',quantity: 1, image: 'http://res.cloudinary.com/atf19/image/upload/c_crop,g_face,h_250,x_248/v1500465308/fashion-men-s-individuality-black-and-white-157675_wnctss.jpg', description: "Hello there, i'm a cool product with a heart of gold."},
-];
-
+import { Query } from "react-apollo";
+import { GET_CART_ITEMS} from ".././Query";
 export default class CartScreen extends React.Component {
   static navigationOptions = {
     title: 'سلة المشتريات',
@@ -30,7 +17,7 @@ export default class CartScreen extends React.Component {
       fontWeight: 'bold',
     },
   };
-
+  
   constructor(props) {
     super(props);
     this.state = {
@@ -39,7 +26,7 @@ export default class CartScreen extends React.Component {
     };
   }
 
-  async  componentWillMount() {
+  async getCartItems() {
     await AsyncStorage.getItem("CART", (err, res) => {
       if (!res) this.setState({cartItems: []});
       else this.setState({cartItems: JSON.parse(res)});
@@ -47,21 +34,25 @@ export default class CartScreen extends React.Component {
     });
   }
 
+  componentWillMount() {
+
+  }
+
   render() {
-    if (!this.state.isLoadingComplete){
-      return  <ActivityIndicator size="large" color="#0000ff" />     
-    }else{
-      return (
-        <Container style={{backgroundColor: '#fdfdfd'}}>
-            {this.state.cartItems.length <=0 ?
-              <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                <Icon.Ionicons name="md-cart" size={38} style={{fontSize: 38, color: '#95a5a6', marginBottom: 7}} />
-                <Text style={{color: '#95a5a6'}}>Your cart is empty</Text>
-              </View>
-              :
-              <Content style={{paddingRight: 10}}>
+    return (
+      <Container style={styles.container}>
+        <Query query={GET_CART_ITEMS} >
+          {({ loading, error, data }) => {
+            if (loading) {
+                return  <ActivityIndicator size="large" color="#0000ff" />
+            }
+            if (error) {
+              return <Text>{error}</Text>;
+            }
+            return(
+              <Content style={styles.content}>
                 <List>
-                    {this.renderItems()}
+                    {this.renderItems(data.cartItems)}
                 </List>
                 <Grid style={{marginTop: 20, marginBottom: 10}}>
                   <Col style={{paddingLeft: 10,paddingRight: 5}}>
@@ -72,33 +63,34 @@ export default class CartScreen extends React.Component {
                   </Col>
                 </Grid>
               </Content>
-            }
-        </Container>
-      )
-    }
+            );
+          }}
+        </Query>
+
+      </Container>
+    )
   }
 
-  renderItems() {
+  renderItems(cartItems) {
     let items = [];
-    this.state.cartItems.map((item, i) => {
+    cartItems.map((item, i) => {
       items.push(
         <ListItem
           key={i}
           last={this.state.cartItems.length === i+1}
           onPress={() => this.itemClicked(item)}
         >
-          <Thumbnail square style={{width: 110, height: 90}} source={{ uri: item.image }} />
+          <Thumbnail square style={styles.thumbnail} source={{ uri: item.imageUrl }} />
           <Body style={{paddingLeft: 10}}>
-            <Text style={{fontSize: 18, textAlign: 'left'}}>
-              {item.quantity > 1 ? item.quantity+"x " : null}
+            <Text style={styles.quantity}>
+              {item.quantity > 1 ? item.quantity+ "x " : null}
               {item.title}
             </Text>
-            <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 10 ,textAlign: 'left'}}>{item.price} IQD</Text>
-            <Text style={{fontSize: 14 ,fontWeight: 'bold', textAlign: 'left'}}>الالون: {item.color}</Text>
-            <Text style={{fontSize: 14 ,fontWeight: 'bold', textAlign: 'left'}}>الحجم: {item.size}</Text>
+            <Text style={styles.itemTitle}>{item.arName}</Text>
+            <Text style={styles.itemPrice}>{item.price} IQD</Text>
           </Body>
           <Right>
-            <Button style={{marginLeft: -25}} transparent onPress={() => this.addQuantity(item)}>
+            <Button style={styles.addButton} transparent onPress={() => this.addQuantity(item)}>
               <Icon.Ionicons size={30} style={{fontSize: 30, color: '#2f95dc'}} name='md-add-circle' />
             </Button>
             <Button style={{marginLeft: -25}} transparent onPress={() => this.removeItem(item)}>
@@ -180,9 +172,15 @@ export default class CartScreen extends React.Component {
 }
 
 const styles={
-  title: {
-    fontWeight: '100'
-  }
+  title: {fontWeight: '100'},
+  container: {backgroundColor: '#fdfdfd'},
+  content: {paddingRight: 10},
+  thumbnail: {width: 110, height: 90},
+  quantity: {fontSize: 18, textAlign: 'left'},
+  itemTitle: {fontSize: 14 ,fontWeight: 'bold', textAlign: 'left'},
+  itemPrice: {fontSize: 16, fontWeight: 'bold', marginBottom: 10 ,textAlign: 'left'},
+  addButton: {marginLeft: -25},
+
 };
 
 
