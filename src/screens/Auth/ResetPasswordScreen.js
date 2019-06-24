@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Container, Content, View, Left, Right, Text, Button, Icon, Item, Input } from 'native-base';
 import { TouchableOpacity, ActivityIndicator, AsyncStorage } from 'react-native';
 import { Mutation } from "react-apollo";
-import { ResetPasswordMutation } from "../../Query"
+import { ResetPasswordMutation } from "../../Mutation"
 
 // Our custom files and classes import
 import Colors from '../../constants/Colors';

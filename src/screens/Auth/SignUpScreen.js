@@ -3,7 +3,7 @@ import { TouchableOpacity, ActivityIndicator, AsyncStorage } from 'react-native'
 import { ScrollView } from 'react-native';
 import { Container, Body, Content, View, Left, Right, Text, Button, Icon, Form, Item, Label, Input, Card, CardItem } from 'native-base';
 import { Mutation } from "react-apollo";
-import { SignUpMutation } from "../../Query"
+import { SignUpMutation } from "../../Mutation"
 // Our custom files and classes import
 import Colors from '../../constants/Colors';
 //import Text from '../../components/Text';
@@ -48,11 +48,10 @@ export default class Signup extends Component {
           <Container style={{backgroundColor: '#fdfdfd'}}>
             <ScrollView contentContainerStyle={{flexGrow: 1}}>
               <Content contentContainerStyle={{padding: 20}}>
-                <View style={{marginBottom: 35, width: '100%'}}>
+                <View style={{width: '100%'}}>
                   <Text style={{fontSize: 24, fontWeight: 'bold', textAlign: 'center', width: '100%', color: Colors.navbarBackgroundColor}}>إنشاء حساب جديد </Text>
                   <Text style={{fontSize: 18, textAlign: 'center', width: '100%', color: '#687373'}}>فضلا أنشأ حساب جديد لتتمكن من المتابعة</Text>
                 </View>
-                <Card>
                   <Form>
                     <CardItem>
                       <Body>
@@ -153,7 +152,6 @@ export default class Signup extends Component {
                       </Body>
                     </CardItem>
                   </Form>
-                </Card>
                 {this.state.hasError && this.state.errors &&  !loading? this.state.errors.map(({ message }, i) => (<Text key={i} style={{color: "#c0392b", textAlign: 'center', marginTop: 10}}>{message}</Text>))
                   :null
                 }

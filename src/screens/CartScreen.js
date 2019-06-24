@@ -1,11 +1,10 @@
 import React from 'react';
 import { Alert, AsyncStorage, ActivityIndicator } from 'react-native';
-import { Container, Content, View, Header, Button, Left, Right, Body, Title, List, ListItem, Thumbnail, Grid, Col } from 'native-base';
+import { Container, Content, View, Header, Icon, Button, Left, Right, Body, Title, List, ListItem, Thumbnail, Grid, Col } from 'native-base';
 import Text from '../components/Text';
 import Navbar from '../components/Navbar';
-import {Icon} from 'expo';
-import { Query } from "react-apollo";
-import { GET_CART_ITEMS} from ".././Query";
+
+
 export default class CartScreen extends React.Component {
   static navigationOptions = {
     title: 'سلة المشتريات',
@@ -25,6 +24,10 @@ export default class CartScreen extends React.Component {
       isloading: true
     };
   }
+  
+  componentWillMount() {
+    this.getCartItems()
+  }
 
   async getCartItems() {
     await AsyncStorage.getItem("CART", (err, res) => {
@@ -34,46 +37,33 @@ export default class CartScreen extends React.Component {
     });
   }
 
-  componentWillMount() {
-
-  }
-
   render() {
-    return (
-      <Container style={styles.container}>
-        <Query query={GET_CART_ITEMS} >
-          {({ loading, error, data }) => {
-            if (loading) {
-                return  <ActivityIndicator size="large" color="#0000ff" />
-            }
-            if (error) {
-              return <Text>{error}</Text>;
-            }
-            return(
-              <Content style={styles.content}>
-                <List>
-                    {this.renderItems(data.cartItems)}
-                </List>
-                <Grid style={{marginTop: 20, marginBottom: 10}}>
-                  <Col style={{paddingLeft: 10,paddingRight: 5}}>
-                    <Button onPress={() => this.checkout()} style={{backgroundColor: '#2f95dc'}} block iconLeft>
-                      <Icon.Ionicons name='md-card' style={{marginLeft: 10}} />
-                      <Text style={{color: '#fff'}}> إنشاء طلب </Text>
-                    </Button>
-                  </Col>
-                </Grid>
-              </Content>
-            );
-          }}
-        </Query>
-
-      </Container>
-    )
+    if (!this.state.isLoadingComplete){     
+      return  <ActivityIndicator size="large" color="#0000ff" />
+    }else{ 
+      return (
+          <Container style={styles.container}>
+            <Content style={styles.content}>
+              <List>
+                  {this.renderItems()}
+              </List>
+              <Grid style={{marginTop: 20, marginBottom: 10}}>
+                <Col style={{paddingLeft: 10,paddingRight: 5}}>
+                  <Button onPress={() => this.checkout()} block iconLeft>
+                    <Icon active name='md-card' style={{marginLeft: 10}} />
+                    <Text style={{color: '#fff'}}> إنشاء طلب </Text>
+                  </Button>
+                </Col>
+              </Grid>
+            </Content>
+          </Container>
+      )
+     }
   }
 
-  renderItems(cartItems) {
+  renderItems() {
     let items = [];
-    cartItems.map((item, i) => {
+    this.state.cartItems.map((item, i) => {
       items.push(
         <ListItem
           key={i}
@@ -91,10 +81,10 @@ export default class CartScreen extends React.Component {
           </Body>
           <Right>
             <Button style={styles.addButton} transparent onPress={() => this.addQuantity(item)}>
-              <Icon.Ionicons size={30} style={{fontSize: 30, color: '#2f95dc'}} name='md-add-circle' />
+              <Icon active size={30} style={{fontSize: 30, color: '#2f95dc'}} name='md-add-circle' />
             </Button>
             <Button style={{marginLeft: -25}} transparent onPress={() => this.removeItem(item)}>
-              <Icon.Ionicons size={30} style={{fontSize: 30, color: '#e6683c'}} name='md-remove-circle' />
+              <Icon active size={30} style={{fontSize: 30, color: '#e6683c'}} name='md-remove-circle' />
             </Button>
           </Right>
         </ListItem>

@@ -23,6 +23,19 @@ const ProductsQuery = gql`
   	
   }`
 
+const MeQuery = gql`{
+	me{
+	  id
+	  fullname
+	  email
+	  mobile
+	  address
+	  updatedAt
+	  createdAt
+	}
+ }`
+
+
 const OrdersQuery = gql`{
 	orders{
 	  id
@@ -52,76 +65,9 @@ const OrdersQuery = gql`{
 	}	
 }`
 
-const SingInMutation = gql`
-  mutation signin($email: String!, $password: String!) {
-    signin(attributes: {email: $email , password: $password}){
-	  user {
-	    id
-	    email
-	    fullname
-	    address
-	    createdAt
-	    token 
-	  }
-    }
-  }
-`
-
-const SignUpMutation = gql`
-  mutation signup($email: String!, $password: String!, $passwordConfirmation: String!  $fullname: String!, $address: String!, $terms: Boolean!, $mobile: Int! ) {
-    signup(attributes: {email: $email, password: $password, passwordConfirmation: $passwordConfirmation, fullname: $fullname , mobile: $mobile, address: $address, terms: $terms}){
-	  user {
-	    id
-	    email
-	    fullname
-	    address
-	    mobile
-	    createdAt
-	    token 
-	  }
-    }
-  }
-`
-
-const ResetPasswordMutation = gql`
-  mutation resetPassword($email: String!) {
-    resetPassword(email: $email){
-      email
-      info
-    }
-  }
-`
-
-const GET_CART_ITEMS = gql`
-  query GetCartItems {
-    cartItems @client
-  }
-`;
-
-const typeDefs = gql`
-  extend type Query {
-    isLoggedIn: Boolean!
-    cartItems: [ID!]!
-  }
-
-  extend type Launch {
-    isInCart: Boolean!
-  }
-
-  extend type Mutation {
-    addOrRemoveFromCart(id: ID!): [Launch]
-  }
-`;
-
-const resolvers = {};
-
 export { 
 	CategoriesQuery, 
 	ProductsQuery,
-	OrdersQuery, 
-	SingInMutation, 
-	GET_CART_ITEMS, 
-	typeDefs, 
-	ResetPasswordMutation, 
-	SignUpMutation 
+	OrdersQuery,
+	MeQuery 
 };

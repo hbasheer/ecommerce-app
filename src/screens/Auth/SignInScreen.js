@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Container, Body, Label, Content, View, Left, Right, Text, Button, Icon, Card, CardItem, Form, Item, Input } from 'native-base';
 import { TouchableOpacity, ActivityIndicator, AsyncStorage } from 'react-native';
 import { Mutation } from "react-apollo";
-import { SingInMutation } from "../../Query"
+import { SingInMutation } from "../../Mutation"
 
 // Our custom files and classes import
 import Colors from '../../constants/Colors';
@@ -45,7 +45,6 @@ export default class Login extends Component {
               <Text style={styles.title}> أهلا بك </Text>
               <Text style={styles.details}>فضلا سجل دخول لكي تتمكن من المتابعة </Text>
             </View>
-            <Card>
               <Form>
                 <CardItem>
                   <Body>
@@ -81,7 +80,6 @@ export default class Login extends Component {
                   </Body>
                 </CardItem>
               </Form>
-            </Card>
             {this.state.hasError && this.state.errors &&  !loading? this.state.errors.map(({ message }, i) => (<Text key={i} style={{color: "#c0392b", textAlign: 'center', marginTop: 10}}>{message}</Text>))
               :null
             }
