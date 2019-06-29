@@ -18,10 +18,34 @@ const ProductsQuery = gql`
 	  kuName
 	  price
 	  arDescription
+	  kuDescription
 	  imageUrl
 	}
   	
   }`
+
+const GetCartQuery = gql`{
+	getCart{
+	  id
+	  price
+	  totalPrice
+	  deliveryPrice
+	  lineItems {
+	    quantity
+	    price
+	    totalPrice
+		    product{
+	        id
+	        arName
+	        kuName
+	        price
+	        arDescription
+	        kuDescription
+	        imageUrl
+	      }
+	  }
+	}
+}`
 
 const MeQuery = gql`{
 	me{
@@ -69,5 +93,6 @@ export {
 	CategoriesQuery, 
 	ProductsQuery,
 	OrdersQuery,
-	MeQuery 
+	MeQuery,
+	GetCartQuery 
 };

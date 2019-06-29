@@ -56,9 +56,93 @@ const UpdateAccountMutation = gql`
   }
 `
 
+const CartRemoveProductMutation =gql`
+	mutation cartRemoveProduct($productId: ID! ) { 
+	  cartRemoveProduct(productId: $productId){
+	    cart{
+		  id
+		  price
+		  totalPrice
+		  deliveryPrice
+		  lineItems {
+		    quantity
+		    price
+		    totalPrice
+		    product{
+		      id
+		      arName
+		      kuName
+		      price
+		      arDescription
+		      kuDescription
+		      imageUrl
+		    }
+	      }
+	    }
+	  }
+	}
+`
+
+const CartAddProductMutation =gql`
+	mutation cartAddProduct($productId: ID! ) { 
+	  cartAddProduct(productId: $productId){
+	    cart{
+		  id
+		  price
+		  totalPrice
+		  deliveryPrice
+		  lineItems {
+		    quantity
+		    price
+		    totalPrice
+		    product{
+		      id
+		      arName
+		      kuName
+		      price
+		      arDescription
+		      kuDescription
+		      imageUrl
+		    }
+	      }
+	    }
+	  }
+	}
+`
+
+const CartDeleteProductMutation =gql`
+	mutation cartDeleteProduct($productId: ID! ) { 
+	  cartDeleteProduct(productId: $productId){
+	    cart{
+		  id
+		  price
+		  totalPrice
+		  deliveryPrice
+		  lineItems {
+		    quantity
+		    price
+		    totalPrice
+		    product{
+		      id
+		      arName
+		      kuName
+		      price
+		      arDescription
+		      kuDescription
+		      imageUrl
+		    }
+	      }
+	    }
+	  }
+	}
+`
+
 export { 
 	SingInMutation, 
 	ResetPasswordMutation, 
 	SignUpMutation,
-	UpdateAccountMutation 
+	UpdateAccountMutation,
+	CartAddProductMutation,
+	CartRemoveProductMutation,
+	CartDeleteProductMutation
 };

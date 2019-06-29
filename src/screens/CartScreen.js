@@ -1,9 +1,11 @@
 import React from 'react';
 import { Alert, AsyncStorage, ActivityIndicator } from 'react-native';
-import { Container, Content, View, Header, Icon, Button, Left, Right, Body, Title, List, ListItem, Thumbnail, Grid, Col } from 'native-base';
+import { Container, Content, Separator, View, Header, Icon, Button, Left, Right, Body, Title, List, ListItem, Thumbnail, Grid, Col } from 'native-base';
 import Text from '../components/Text';
 import Navbar from '../components/Navbar';
-
+import { Mutation, Query } from "react-apollo";
+import {  CartAddProductMutation, CartRemoveProductMutation, CartDeleteProductMutation } from ".././Mutation"
+import { GetCartQuery } from ".././Query"
 
 export default class CartScreen extends React.Component {
   static navigationOptions = {
@@ -20,156 +22,261 @@ export default class CartScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      cartItems: [],
-      isloading: true
+      cart: {
+        id: 0,
+        deliveryPrice: 0,
+        price: 0,
+        totalPrice: 0,
+        items: [],
+      },
+      isFirstRender: true,
     };
   }
   
-  componentWillMount() {
-    this.getCartItems()
+  _updateCartfromQuery = (data) => {
+    if (data && this.state.isFirstRender) {
+      this.setState({
+        cart: {
+          id: data.getCart.id,
+          deliveryPrice: data.getCart.deliveryPrice,
+          price: data.getCart.price,
+          totalPrice: data.getCart.totalPrice,
+          items: data.getCart.lineItems,
+        },
+        isFirstRender: false
+      })
+    }
   }
 
-  async getCartItems() {
-    await AsyncStorage.getItem("CART", (err, res) => {
-      if (!res) this.setState({cartItems: []});
-      else this.setState({cartItems: JSON.parse(res)});
-      this.setState({ isLoadingComplete: true });
-    });
+  _updateCartfromMutation = (data) => {
+    if (data) {
+      this.setState({
+        cart: {
+          id: data.id,
+          deliveryPrice: data.deliveryPrice,
+          price: data.price,
+          totalPrice: data.totalPrice,
+          items: data.lineItems,
+        }
+      })
+    }
   }
-
   render() {
-    if (!this.state.isLoadingComplete){     
-      return  <ActivityIndicator size="large" color="#0000ff" />
-    }else{ 
-      return (
-          <Container style={styles.container}>
-            <Content style={styles.content}>
-              <List>
-                  {this.renderItems()}
-              </List>
-              <Grid style={{marginTop: 20, marginBottom: 10}}>
-                <Col style={{paddingLeft: 10,paddingRight: 5}}>
-                  <Button onPress={() => this.checkout()} block iconLeft>
-                    <Icon active name='md-card' style={{marginLeft: 10}} />
-                    <Text style={{color: '#fff'}}> إنشاء طلب </Text>
-                  </Button>
-                </Col>
-              </Grid>
-            </Content>
-          </Container>
-      )
-     }
+    return (
+      <Container style={styles.container}>
+        <Query 
+          query={GetCartQuery} 
+          onCompleted={data => this._updateCartfromQuery(data)}
+
+          >
+          {({ loading, error, data }) => {
+            if (loading) {
+                return  <ActivityIndicator size="large" color="#0000ff" />
+            }
+            if (error) {
+              return <Text>{error}</Text>;
+            }
+            return (            
+              <Content style={styles.content}>
+                {this.state.cart.items.length > 0 ? 
+                  <List>
+                      {this.renderItems(this.state.cart)}
+                    <Separator bordered>
+                      <Text></Text>
+                    </Separator>
+                    <ListItem noIndent bordered style={styles.metalist}>
+                      <Left>
+                        <Text style={styles.cartMeta}>المجموع:</Text>
+                      </Left>
+                      <Right>
+                        <Text style={styles.cartPrice}>{this.state.cart.price} IQD </Text>
+                      </Right>
+                    </ListItem>
+                    <ListItem noIndent bordered style={styles.metalist}>
+                     <Left>
+                        <Text style={styles.cartMeta}>سعر التوصيل:</Text>
+                      </Left>
+                      <Right>
+                        <Text style={styles.cartPrice}>{this.state.cart.deliveryPrice} IQD</Text>
+                      </Right>
+                    </ListItem>
+                    <ListItem noIndent bordered style={styles.metalist}>
+                      <Left>
+                        <Text style={styles.cartMeta}>المجموع الكلي:</Text>
+                      </Left>
+                      <Right>
+                        <Text style={styles.cartPrice}>{this.state.cart.totalPrice} IQD</Text>
+                      </Right>
+                    </ListItem>
+                    <Separator >
+                      <Text></Text>
+                    </Separator>
+                    <ListItem>
+                      <Grid style={{marginTop: 20, marginBottom: 10}}>
+                        <Col style={{paddingLeft: 10,paddingRight: 5}}>
+                          <Button onPress={() => this.checkout()} block iconLeft>
+                            <Icon active name='md-card' style={{marginRight: 10}} />
+                            <Text style={{color: '#fff'}}> إنشاء طلب </Text>
+                          </Button>
+                        </Col>
+                      </Grid>
+                    </ListItem>
+
+                  </List>
+                : 
+                 <View style={styles.centerView}>
+                   <Text style={styles.emptyText}> سلة المشتريات فارغة</Text>
+                 </View>
+                }
+              </Content>
+            )
+          }}
+        </Query>
+      </Container>
+    )
   }
 
-  renderItems() {
+  renderItems(cart) {
+    console.log(cart)
     let items = [];
-    this.state.cartItems.map((item, i) => {
+    cart.items.map((item, i) => {
       items.push(
         <ListItem
           key={i}
-          last={this.state.cartItems.length === i+1}
+          last={cart.items.length === i+1}
           onPress={() => this.itemClicked(item)}
         >
-          <Thumbnail square style={styles.thumbnail} source={{ uri: item.imageUrl }} />
+          <Thumbnail square style={styles.thumbnail} source={{ uri: item.product.imageUrl }} />
           <Body style={{paddingLeft: 10}}>
             <Text style={styles.quantity}>
               {item.quantity > 1 ? item.quantity+ "x " : null}
               {item.title}
             </Text>
-            <Text style={styles.itemTitle}>{item.arName}</Text>
-            <Text style={styles.itemPrice}>{item.price} IQD</Text>
+            <Text style={styles.itemTitle}>{item.product.arName}</Text>
+            <Text style={styles.itemPrice}>{item.product.price} IQD</Text>
           </Body>
           <Right>
-            <Button style={styles.addButton} transparent onPress={() => this.addQuantity(item)}>
-              <Icon active size={30} style={{fontSize: 30, color: '#2f95dc'}} name='md-add-circle' />
-            </Button>
-            <Button style={{marginLeft: -25}} transparent onPress={() => this.removeItem(item)}>
-              <Icon active size={30} style={{fontSize: 30, color: '#e6683c'}} name='md-remove-circle' />
-            </Button>
+            <Mutation 
+              mutation={CartAddProductMutation}
+              onCompleted={data => this._updateCartfromMutation(data.cartAddProduct.cart)}
+              >
+              {(cartAddProduct, { loading, error }) => {
+
+              
+                if (loading) {
+                  return(
+                    <Button style={{marginLeft: -10}} transparent >
+                      <ActivityIndicator size="small" color="#0000ff" style = {styles.activityIndicator} />
+                    </Button>
+                  )  
+
+                }
+                return (
+                  <Button style={styles.addButton} transparent onPress={() => 
+                    {
+                      cartAddProduct({
+                        variables: {
+                          productId: item.product.id,
+                        }
+                      })
+                    }
+                  }>
+                    <Icon active size={25} style={{fontSize: 25, color: '#2f95dc'}} name='md-add-circle' />
+                  </Button>
+                )
+              }}
+            </Mutation>
+            <Mutation
+              mutation={CartRemoveProductMutation}
+              onCompleted={data => this._updateCartfromMutation(data.cartRemoveProduct.cart)}
+            > 
+              {(cartRemoveProduct, { loading, error }) => {
+                if (loading) {
+                  return(
+                    <Button style={{marginLeft: -10}} transparent >
+                      <ActivityIndicator size="small" color="#0000ff" style = {styles.activityIndicator} />
+                    </Button>
+                  )  
+
+                }
+                return (
+                  <Button style={{marginLeft: -25}} transparent onPress={() => 
+                    {
+                      cartRemoveProduct({
+                        variables: {
+                          productId: item.product.id,
+                        }
+                      })
+                    }
+                  }>
+                    <Icon active size={25} style={{fontSize: 25, color: '#e6683c'}} name='md-remove-circle' />
+                  </Button>
+                )
+              }}
+            </Mutation>
+            <Mutation
+              mutation={CartDeleteProductMutation}
+              onCompleted={data => this._updateCartfromMutation(data.cartDeleteProduct.cart)}
+            > 
+              {(cartDeleteProduct, { loading, error }) => {
+                if (loading) {
+                  return(
+                    <Button style={{marginLeft: -10}} transparent >
+                      <ActivityIndicator size="small" color="#0000ff" style = {styles.activityIndicator} />
+                    </Button>
+                  )  
+
+                }
+                return (
+                  <Button style={{marginLeft: -25}} transparent onPress={() => 
+                    {
+                      cartDeleteProduct({
+                        variables: {
+                          productId: item.product.id,
+                        }
+                      })
+                    }
+                  }>
+                    <Icon active size={35} style={{color: '#e6683c'}} name='md-trash' />
+                  </Button>
+                )
+              }}
+            </Mutation>
           </Right>
         </ListItem>
       );
     });
     return items;
   }
-
-  removeItemPressed(item) {
-    Alert.alert(
-      'Remove '+item.title,
-      'Are you sure you want this item from your cart ?',
-      [
-        {text: 'No', onPress: () => console.log('No Pressed'), style: 'cancel'},
-        {text: 'Yes', onPress: () => this.removeItem(item)},
-      ]
-    )
-  }
-
-  addQuantity(quantityToItem) {
-    let items = [];
-    this.state.cartItems.map((item) => {
-      if(JSON.stringify(item) == JSON.stringify(quantityToItem) ){
-        item.quantity += 1
-        items.push(item);
-      }else{
-        items.push(item);
-      }
-    });
-    this.setState({cartItems: items});
-    AsyncStorage.setItem("CART", JSON.stringify(items));
-    AsyncStorage.setItem("CART_ITEMS", JSON.stringify(items.length));
-  }
-
-  removeItem(itemToRemove) {
-    let items = [];
-    this.state.cartItems.map((item) => {
-      if(JSON.stringify(item) !== JSON.stringify(itemToRemove) ){
-        items.push(item);
-      }
-      else{
-        if(item.quantity > 1){
-          item.quantity -= 1
-          items.push(item);
-        }
-      }
-    });
-    this.setState({cartItems: items});
-    AsyncStorage.setItem("CART", JSON.stringify(items));
-    AsyncStorage.setItem("CART_ITEMS", JSON.stringify(items.length));
-  }
-
-  removeAllPressed() {
-    Alert.alert(
-      'Empty cart',
-      'Are you sure you want to empty your cart ?',
-      [
-        {text: 'No', onPress: () => console.log('No Pressed'), style: 'cancel'},
-        {text: 'Yes', onPress: () => this.removeAll()}
-      ]
-    )
-  }
-
-  removeAll() {
-    this.setState({cartItems: []})
-    AsyncStorage.setItem("CART",JSON.stringify([]));
-  }
-
-  checkout() {
-  }
-
-  itemClicked(item) {
-  }
-
 }
 
 const styles={
   title: {fontWeight: '100'},
   container: {backgroundColor: '#fdfdfd'},
-  content: {paddingRight: 10},
+  content: {paddingRight: 0},
   thumbnail: {width: 110, height: 90},
   quantity: {fontSize: 18, textAlign: 'left'},
-  itemTitle: {fontSize: 14 ,fontWeight: 'bold', textAlign: 'left'},
+  itemTitle: {fontSize: 16, fontWeight: 'bold', textAlign: 'left'},
   itemPrice: {fontSize: 16, fontWeight: 'bold', marginBottom: 10 ,textAlign: 'left'},
   addButton: {marginLeft: -25},
+  cartPrice: {fontSize: 14, fontWeight: 'bold'},
+  cartMeta: {fontSize: 14, fontWeight: 'bold'},
+  metalist: { backgroundColor: "#fff", borderBottom: "#eeeeee" },
+  activityIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 14, 
+    fontWeight: 'bold',
+    paddingTop:50
+  },
+  centerView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center' 
+  }
 
 };
 
