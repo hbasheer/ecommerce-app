@@ -65,6 +65,7 @@ const OrdersQuery = gql`{
 	  id
 	  price
 	  deliveryPrice
+	  totalPrice
 	  address
 	  status
 	  createdAt

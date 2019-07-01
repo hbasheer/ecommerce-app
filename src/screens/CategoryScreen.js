@@ -12,8 +12,9 @@ import {
   AsyncStorage
 } from 'react-native';
 import {Icon} from 'expo';
-import { Query } from "react-apollo";
-import { ProductsQuery} from ".././Query";
+import { Mutation, Query } from "react-apollo";
+import { CartAddProductMutation } from ".././Mutation"
+import { ProductsQuery, GetCartQuery} from ".././Query";
 
 export default class CategoryScreen extends React.Component {
   constructor(props) {
@@ -108,10 +109,36 @@ export default class CategoryScreen extends React.Component {
                     
                     <View style={styles.cardFooter}>
                       <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.socialBarButton} onPress={() => this.addItemToCart(item)}>
-                          <Image style={styles.icon} source={{uri: 'https://png.icons8.com/nolan/96/3498db/add-shopping-cart.png'}}/>
-                          <Text style={[styles.socialBarLabel, styles.addToCart]}>أضف إلى السلة</Text>
-                        </TouchableOpacity>
+                        <Mutation 
+                          mutation={CartAddProductMutation}
+                          refetchQueries={() => {
+                             return [{
+                                query: GetCartQuery,
+                            }];
+                          }}
+                          >
+                          {(cartAddProduct, { loading, error }) => {
+
+                            if (loading) {
+                              return <ActivityIndicator size="large" color="#0000ff" style = {styles.activityIndicator} />
+                            }
+
+                            return (
+                              <TouchableOpacity style={styles.socialBarButton} onPress={() => 
+                                {
+                                  cartAddProduct({
+                                    variables: {
+                                      productId: item.id,
+                                    }
+                                  })
+                                }
+                              }>
+                                <Image style={styles.icon} source={{uri: 'https://png.icons8.com/nolan/96/3498db/add-shopping-cart.png'}}/>
+                                <Text style={[styles.socialBarLabel, styles.addToCart]}>أضف إلى السلة</Text>
+                              </TouchableOpacity>
+                            )
+                          }}
+                        </Mutation>
                       </View>
                     </View>
                   </View>

@@ -1,22 +1,23 @@
 import React, { Component } from 'react';
 import {
   StyleSheet,
-  Text,
-  View,
-  TextInput,
-  Button,
   TouchableHighlight,
-  Alert,
-  Image,
-  ListView,
   TouchableOpacity,
-  ActivityIndicator
+  ActivityIndicator,
+  View
 } from 'react-native';
+import { Container, Header, Content, Grid, Row, Col, Text, Left, Body, Right, Button, Card, CardItem } from 'native-base';
+
 import { FlatGrid } from 'react-native-super-grid';
 
 import { Query } from "react-apollo";
 import { OrdersQuery} from ".././Query";
 
+const OrderStatus = {
+    "executing": ["قيد التنفيذ", "#0275d8"],
+    "completed": ["تم التسليم", "#5cb85c"],
+    "cancelled": ["ملغي", "#d9534f"]
+  }
 export default class OrdersScrren extends Component {
 
   constructor(props) {
@@ -24,6 +25,7 @@ export default class OrdersScrren extends Component {
     this.state = {}
       
   }
+
 
   static navigationOptions = ({ navigation }) => ({
     title: "طلباتي",
@@ -35,14 +37,46 @@ export default class OrdersScrren extends Component {
       fontWeight: 'bold',
     },
   });
+
   orderClickListener = (viewId) => {
     Alert.alert("alert", "order clicked");
   }
 
+  renderItems(orders) {
+    let items = [];
+    orders.map((order, i) => {
+      items.push(
+      <CardItem 
+        bordered key={i} 
+        button
+        onPress={() => this.props.navigation.navigate('OrderDetail', {order})}
+        >
+        <Grid>
+          <Row>
+            <Col>
+                <Text style={styles.Rtext}>رقم الطلب</Text>
+                <Text style={styles.Rtext}>السعر الكلي:</Text>
+                <Text style={styles.Rtext}>سعر التوصيل:</Text>
+                <Text style={styles.Rtext}>حالة الطلب:</Text>
+            </Col>
+            <Col>
+              <Text style={styles.text}>#{order.id}</Text>
+              <Text style={styles.text}>{order.price} IQD</Text>
+              <Text style={styles.text}>{order.deliveryPrice} IQD</Text>
+              <Text style={{fontSize:16, textAlign: 'center', color: OrderStatus[order.status][1]}}>{OrderStatus[order.status][0]}</Text>
+            </Col>
+          </Row>
+        </Grid>
+       </CardItem>
+      );
+    });
+    return items;
+  }
+
+
   render() {
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
     return (
-      <View style={styles.container}>
+      <Container style={styles.container}>
         <Query query={OrdersQuery} >
           {({ loading, error, data }) => {
             if (loading) {
@@ -52,30 +86,18 @@ export default class OrdersScrren extends Component {
               return <Text>{error}</Text>;
             }
             return(
-              <ListView enableEmptySections={true}
-                style={styles.orderList}
-                dataSource={ds.cloneWithRows(data.orders)}
-                renderRow={(order) => {
-                  return (
-                    <TouchableOpacity onPress={() => this.orderClickListener("row")}>
-                      <View style={styles.orderBox}>
-                        <View style={styles.orderContent}>
-                          <Text  style={styles.userName}>الزبون: {order.user.fullname}</Text>
-                          <Text  style={styles.orderTime}>تاريخ الطلب: {order.createdAt}</Text>
-                          <Text  style={styles.orderStatus}>حالة الطلب: {order.status}</Text>
-                          <Text  style={styles.orderPrice}>الإجمالي: {order.price} IQD</Text>
-                        </View>
-                      </View>
-                    </TouchableOpacity>
-                  )
-                }}/>
+              <Content padder>
+                <Card>
+                  {this.renderItems(data.orders)}
+                </Card>
+              </Content>
             )
 
           }}
 
         </Query>
 
-      </View>
+      </Container>
     );
   }
 }
@@ -84,43 +106,12 @@ const styles = StyleSheet.create({
   container:{
     backgroundColor: "#fff",
   },
-  orderList:{
-    marginTop:20,
+  text:{
+   fontSize:16,
+   textAlign: 'center'
   },
-  orderBox: {
-    padding:10,
-    marginTop:5,
-    marginBottom:5,
-    flexDirection: 'row',
-    
-  },
-  orderDate:{
-    flexDirection: 'column',
-  },
-  orderId:{
-    fontSize:18,
-    color: "#0099FF",
-    fontWeight: "600",
-  },
-  orderContent: {
-    flex:1,
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    marginLeft:10,
-    backgroundColor: "#DCDCDC",
-    padding:10,
-    borderRadius:10
-  },
-  description:{
-    fontSize:15,
-    color: "#646464",
-  },
-  orderPrice:{
-    fontSize:16,
-    color:"#151515",
-  },
-  userName:{
-    fontSize:16,
-    color:"#151515",
+  Rtext:{
+   fontSize:16,
+   textAlign: 'left'
   },
 });

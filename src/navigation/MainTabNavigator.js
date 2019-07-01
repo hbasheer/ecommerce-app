@@ -13,7 +13,7 @@ import CartScreen from '../screens/CartScreen';
 import ProductDetailScreen from '../screens/CartScreen';
 import ListAllScreen from '../screens/CartScreen';
 import OrdersScreen from '../screens/OrdersScreen';
-import OrderScreen from '../screens/CartScreen';
+import OrderScreen from '../screens/OrderScreen';
 import UpdateAccountScreen from '../screens/CartScreen';
 import FavoritesScreen from '../screens/CartScreen';
 

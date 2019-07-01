@@ -65,7 +65,7 @@ export default class CartScreen extends React.Component {
     return (
       <Container style={styles.container}>
         <Query 
-          query={GetCartQuery} 
+          query={GetCartQuery}
           onCompleted={data => this._updateCartfromQuery(data)}
 
           >
@@ -137,14 +137,12 @@ export default class CartScreen extends React.Component {
   }
 
   renderItems(cart) {
-    console.log(cart)
     let items = [];
     cart.items.map((item, i) => {
       items.push(
         <ListItem
           key={i}
           last={cart.items.length === i+1}
-          onPress={() => this.itemClicked(item)}
         >
           <Thumbnail square style={styles.thumbnail} source={{ uri: item.product.imageUrl }} />
           <Body style={{paddingLeft: 10}}>
