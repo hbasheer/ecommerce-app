@@ -90,10 +90,41 @@ const OrdersQuery = gql`{
 	}	
 }`
 
+const getCartLocal = gql`
+  query getCartLocal {
+    cart @client {
+	  id
+	  price
+	  totalPrice
+	  deliveryPrice
+	  items {
+	    price
+	    quantity
+	    product {
+          id
+          arName
+          kuName
+          price
+          arDescription
+          imageUrl
+	    }
+	  }
+    }
+  }
+`;
+
+const getCartCountLocal = gql`
+  query getCartCountLocal {
+    cartCount @client
+  }
+`;
+
 export { 
 	CategoriesQuery, 
 	ProductsQuery,
 	OrdersQuery,
 	MeQuery,
-	GetCartQuery 
+	GetCartQuery,
+	getCartCountLocal,
+	getCartLocal
 };

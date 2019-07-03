@@ -11,10 +11,12 @@ import {
   FlatList,
   AsyncStorage
 } from 'react-native';
-import {Icon} from 'expo';
+import { Icon, Grid, Col } from 'native-base';
+
 import { Mutation, Query } from "react-apollo";
 import { CartAddProductMutation } from ".././Mutation"
 import { ProductsQuery, GetCartQuery} from ".././Query";
+import client from '.././ApolloClient';
 
 export default class CategoryScreen extends React.Component {
   constructor(props) {
@@ -36,34 +38,23 @@ export default class CategoryScreen extends React.Component {
     },
   });
 
-  async getCartItems() {
-    await AsyncStorage.getItem("CART", (err, res) => {
-      if (!res) this.setState({cartItems: []});
-      else this.setState({cartItems: JSON.parse(res)});
-    });
-  }
-
-   addItemToCart(product){
-      // Get current list of products
-      this.getCartItems();
-      let products = this.state.cartItems
-      let idx = this.state.cartItems.indexOf(product)
-      
-      if (this.state.cartItems.indexOf(product) !== -1) {
-        products[idx].quantity += 1;
-      } else {
-        let new_product = Object.assign(product, {quantity: 1});
-        products.push(new_product);
-      }
-      
-      // Update the state
-      this.setState({
-        cartItems: products,
-      })
-      AsyncStorage.setItem("CART", JSON.stringify(products));
-      AsyncStorage.setItem("CART_ITEMS", JSON.stringify(products.length));
-      Alert.alert('تنبيه!', 'تم إضافة المنتج للسلة بنجاح');
+  _updateCartfromMutation = (data) => {
+    if (data) {
+      client.writeData({ data: 
+        {
+         cart: {
+          __typename: 'Cart',
+          id: data.id,
+          price: data.price,
+          totalPrice: data.totalPrice,
+          deliveryPrice: data.deliveryPrice,
+          items: data.lineItems
+         },
+         cartCount: data.lineItems.length,
+        }
+      });
     }
+  }
 
   render() {
     const categoryId = this.state.category ? this.state.category.id : null;
@@ -111,16 +102,14 @@ export default class CategoryScreen extends React.Component {
                       <View style={styles.buttonContainer}>
                         <Mutation 
                           mutation={CartAddProductMutation}
-                          refetchQueries={() => {
-                             return [{
-                                query: GetCartQuery,
-                            }];
-                          }}
-                          >
+                          onCompleted={data => this._updateCartfromMutation(data.cartAddProduct.cart)}
+                        >
                           {(cartAddProduct, { loading, error }) => {
 
                             if (loading) {
-                              return <ActivityIndicator size="large" color="#0000ff" style = {styles.activityIndicator} />
+                              return (
+                                  <ActivityIndicator size="small" color="#0000ff" style={[styles.socialBarLabel, styles.addToCart]} />
+                              )
                             }
 
                             return (
@@ -133,7 +122,7 @@ export default class CategoryScreen extends React.Component {
                                   })
                                 }
                               }>
-                                <Image style={styles.icon} source={{uri: 'https://png.icons8.com/nolan/96/3498db/add-shopping-cart.png'}}/>
+                                <Icon active size={25} style={{fontSize: 25, color: '#2f95dc'}} name='md-add-circle' />
                                 <Text style={[styles.socialBarLabel, styles.addToCart]}>أضف إلى السلة</Text>
                               </TouchableOpacity>
                             )
@@ -224,6 +213,7 @@ const styles = StyleSheet.create({
   },
   addToCart:{
     color: "#2f95dc",
+    marginLeft: 5,
   },
   icon: {
     width:25,

@@ -1,34 +1,17 @@
 import React from "react";
 import { Text, AsyncStorage, StyleSheet } from 'react-native';
+import { Query } from "react-apollo";
+import { getCartCountLocal } from ".././Query"
 
 export default class NotiTabBarIcon extends React.Component {
-  constructor(props){
-    super(props);
-    this.state = {
-      count: 0,
-    }
-  }
-
-  componentDidMount(){
-    setInterval(
-      () => this.getCartItem(),
-      1000
-    );
-  }
-
-  async getCartItem(){
-    await AsyncStorage.getItem("CART_ITEMS", (err, res) => {
-      if (res)this.setState({count: JSON.parse(res)});
-    });
-  }
-
   render() {
-
     return (
-      <Text 
-        style={this.state.count > 0 ? styles.badge : styles.hidden }>{this.state.count}</Text>
+      <Query query={getCartCountLocal}>
+        {({data}) => (
+          data.cartCount ? <Text style={data.cartCount > 0 ? styles.badge : styles.hidden }>{data.cartCount}</Text> : null
+        )}
+      </Query>
     );
-    
   }
 }
 

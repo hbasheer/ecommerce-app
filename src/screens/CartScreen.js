@@ -5,7 +5,8 @@ import Text from '../components/Text';
 import Navbar from '../components/Navbar';
 import { Mutation, Query } from "react-apollo";
 import {  CartAddProductMutation, CartRemoveProductMutation, CartDeleteProductMutation } from ".././Mutation"
-import { GetCartQuery } from ".././Query"
+import { GetCartQuery, getCartLocal } from ".././Query"
+import client from '.././ApolloClient';
 
 export default class CartScreen extends React.Component {
   static navigationOptions = {
@@ -19,77 +20,38 @@ export default class CartScreen extends React.Component {
     },
   };
   
-  constructor(props) {
-    super(props);
-    this.state = {
-      cart: {
-        id: 0,
-        deliveryPrice: 0,
-        price: 0,
-        totalPrice: 0,
-        items: [],
-      },
-      isFirstRender: true,
-    };
-  }
-  
-  _updateCartfromQuery = (data) => {
-    if (data && this.state.isFirstRender) {
-      this.setState({
-        cart: {
-          id: data.getCart.id,
-          deliveryPrice: data.getCart.deliveryPrice,
-          price: data.getCart.price,
-          totalPrice: data.getCart.totalPrice,
-          items: data.getCart.lineItems,
-        },
-        isFirstRender: false
-      })
-    }
-  }
-
   _updateCartfromMutation = (data) => {
     if (data) {
-      this.setState({
-        cart: {
+      client.writeData({ data: 
+        {
+         cart: {
+          __typename: 'Cart',
           id: data.id,
-          deliveryPrice: data.deliveryPrice,
           price: data.price,
           totalPrice: data.totalPrice,
-          items: data.lineItems,
+          deliveryPrice: data.deliveryPrice,
+          items: data.lineItems
+         },
+         cartCount: data.lineItems.length,
         }
-      })
+      });
     }
   }
   render() {
     return (
       <Container style={styles.container}>
-        <Query 
-          query={GetCartQuery}
-          onCompleted={data => this._updateCartfromQuery(data)}
-
-          >
-          {({ loading, error, data }) => {
-            if (loading) {
-                return  <ActivityIndicator size="large" color="#0000ff" />
-            }
-            if (error) {
-              return <Text>{error}</Text>;
-            }
+        <Query query={getCartLocal} >
+          {({ data }) => {
             return (            
               <Content style={styles.content}>
-                {this.state.cart.items.length > 0 ? 
+                {data.cart.items.length > 0  ? 
                   <List>
-                      {this.renderItems(this.state.cart)}
-                    <Separator bordered>
-                      <Text></Text>
-                    </Separator>
                     <ListItem noIndent bordered style={styles.metalist}>
                       <Left>
                         <Text style={styles.cartMeta}>المجموع:</Text>
                       </Left>
                       <Right>
-                        <Text style={styles.cartPrice}>{this.state.cart.price} IQD </Text>
+                        <Text style={styles.cartPrice}>{data.cart.price} IQD </Text>
                       </Right>
                     </ListItem>
                     <ListItem noIndent bordered style={styles.metalist}>
@@ -97,7 +59,7 @@ export default class CartScreen extends React.Component {
                         <Text style={styles.cartMeta}>سعر التوصيل:</Text>
                       </Left>
                       <Right>
-                        <Text style={styles.cartPrice}>{this.state.cart.deliveryPrice} IQD</Text>
+                        <Text style={styles.cartPrice}>{data.cart.deliveryPrice} IQD</Text>
                       </Right>
                     </ListItem>
                     <ListItem noIndent bordered style={styles.metalist}>
@@ -105,10 +67,14 @@ export default class CartScreen extends React.Component {
                         <Text style={styles.cartMeta}>المجموع الكلي:</Text>
                       </Left>
                       <Right>
-                        <Text style={styles.cartPrice}>{this.state.cart.totalPrice} IQD</Text>
+                        <Text style={styles.cartPrice}>{data.cart.totalPrice} IQD</Text>
                       </Right>
                     </ListItem>
                     <Separator >
+                      <Text></Text>
+                    </Separator>
+                      {this.renderItems(data.cart)}
+                    <Separator bordered>
                       <Text></Text>
                     </Separator>
                     <ListItem>
@@ -121,7 +87,6 @@ export default class CartScreen extends React.Component {
                         </Col>
                       </Grid>
                     </ListItem>
-
                   </List>
                 : 
                  <View style={styles.centerView}>
@@ -157,7 +122,7 @@ export default class CartScreen extends React.Component {
             <Mutation 
               mutation={CartAddProductMutation}
               onCompleted={data => this._updateCartfromMutation(data.cartAddProduct.cart)}
-              >
+            >
               {(cartAddProduct, { loading, error }) => {
 
               
