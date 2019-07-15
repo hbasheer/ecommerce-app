@@ -119,6 +119,12 @@ const getCartCountLocal = gql`
   }
 `;
 
+const getCartItemIds = gql`
+  query getCartItemIds {
+    cartItemIds @client
+  }
+`;
+
 export { 
 	CategoriesQuery, 
 	ProductsQuery,
@@ -126,5 +132,6 @@ export {
 	MeQuery,
 	GetCartQuery,
 	getCartCountLocal,
+	getCartItemIds,
 	getCartLocal
 };

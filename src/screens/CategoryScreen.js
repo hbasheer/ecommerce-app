@@ -15,7 +15,7 @@ import { Icon, Grid, Col } from 'native-base';
 
 import { Mutation, Query } from "react-apollo";
 import { CartAddProductMutation } from ".././Mutation"
-import { ProductsQuery, GetCartQuery} from ".././Query";
+import { ProductsQuery, getCartItemIds} from ".././Query";
 import client from '.././ApolloClient';
 
 export default class CategoryScreen extends React.Component {
@@ -51,6 +51,7 @@ export default class CategoryScreen extends React.Component {
           items: data.lineItems
          },
          cartCount: data.lineItems.length,
+         cartItemIds: data.lineItems.map(item => item.product.id)
         }
       });
     }
@@ -214,6 +215,11 @@ const styles = StyleSheet.create({
   addToCart:{
     color: "#2f95dc",
     marginLeft: 5,
+  },
+  showCart: {
+    color: "#2f95dc",
+    marginLeft: 5,
+     backgroundColor: '#fff'
   },
   icon: {
     width:25,

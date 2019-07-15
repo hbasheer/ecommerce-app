@@ -14,6 +14,8 @@ import ProductDetailScreen from '../screens/CartScreen';
 import ListAllScreen from '../screens/CartScreen';
 import OrdersScreen from '../screens/OrdersScreen';
 import OrderScreen from '../screens/OrderScreen';
+import NewOrderScreen from '../screens/NewOrderScreen';
+
 import UpdateAccountScreen from '../screens/CartScreen';
 import FavoritesScreen from '../screens/CartScreen';
 
@@ -43,6 +45,7 @@ const HomeStack = createStackNavigator(
 const CartStack = createStackNavigator(
   {
     Cart: { screen: CartScreen },
+    NewOrder: { screen: NewOrderScreen},
     ProductDetail: { screen: ProductDetailScreen },
   },
   {

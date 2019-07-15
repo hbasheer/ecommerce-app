@@ -5,12 +5,9 @@ import {
   AsyncStorage
 } from 'react-native';
 import { Container, Content, Text, Separator, View, Header, Icon, Button, Left, Right, Body, Title, List, ListItem, Thumbnail, Grid, Col } from 'native-base';
+import OrderStatus  from ".././constants/Helper";
+import ProductsList from '.././components/ProductsList';
 
-const OrderStatus = {
-    "executing": ["قيد التنفيذ", "#0275d8"],
-    "completed": ["تم التسليم", "#5cb85c"],
-    "cancelled": ["ملغي", "#d9534f"]
-  }
 export default class OrderScreen extends React.Component {
   constructor(props) {
     super(props)
@@ -30,28 +27,6 @@ export default class OrderScreen extends React.Component {
     },
   });
 
-  renderItems(order) {
-    let items = [];
-    order.items.map((item, i) => {
-      items.push(
-        <ListItem
-          key={i}
-          last={order.items.length === i+1}
-        >
-          <Thumbnail square style={styles.thumbnail} source={{ uri: item.product.imageUrl }} />
-          <Body style={{paddingLeft: 10}}>
-            <Text style={styles.quantity}>
-              {item.quantity > 1 ? item.quantity+ "x " : null}
-              {item.title}
-            </Text>
-            <Text style={styles.itemTitle}>{item.product.arName}</Text>
-            <Text style={styles.itemPrice}>{item.product.price} IQD</Text>
-          </Body>
-        </ListItem>
-      );
-    });
-    return items;
-  }
   render() {
     return (
       <Container style={styles.container}>            
@@ -97,7 +72,7 @@ export default class OrderScreen extends React.Component {
                   <Text style={styles.orderPrice}>{this.state.order.totalPrice} IQD</Text>
                 </Right>
               </ListItem>
-              {this.renderItems(this.state.order)}
+              <ProductsList products={this.state.order.items} />
 
             </List>
         </Content>
@@ -110,10 +85,6 @@ const styles={
   title: {fontWeight: '100'},
   container: {backgroundColor: '#fdfdfd'},
   content: {paddingRight: 0},
-  thumbnail: {width: 110, height: 90},
-  quantity: {fontSize: 18, textAlign: 'left'},
-  itemTitle: {fontSize: 16, fontWeight: 'bold', textAlign: 'left'},
-  itemPrice: {fontSize: 16, fontWeight: 'bold', marginBottom: 10 ,textAlign: 'left'},
   addButton: {marginLeft: -25},
   orderPrice: {fontSize: 14, fontWeight: 'bold'},
   orderMeta: {fontSize: 14, fontWeight: 'bold'},

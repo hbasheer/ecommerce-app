@@ -3,10 +3,9 @@ import { Alert, AsyncStorage, ActivityIndicator } from 'react-native';
 import { Container, Content, Separator, View, Header, Icon, Button, Left, Right, Body, Title, List, ListItem, Thumbnail, Grid, Col } from 'native-base';
 import Text from '../components/Text';
 import Navbar from '../components/Navbar';
-import { Mutation, Query } from "react-apollo";
-import {  CartAddProductMutation, CartRemoveProductMutation, CartDeleteProductMutation } from ".././Mutation"
-import { GetCartQuery, getCartLocal } from ".././Query"
-import client from '.././ApolloClient';
+import { Query } from "react-apollo";
+import { getCartLocal } from ".././Query"
+import CartProducts from "../components/CartProducts"
 
 export default class CartScreen extends React.Component {
   static navigationOptions = {
@@ -20,23 +19,6 @@ export default class CartScreen extends React.Component {
     },
   };
   
-  _updateCartfromMutation = (data) => {
-    if (data) {
-      client.writeData({ data: 
-        {
-         cart: {
-          __typename: 'Cart',
-          id: data.id,
-          price: data.price,
-          totalPrice: data.totalPrice,
-          deliveryPrice: data.deliveryPrice,
-          items: data.lineItems
-         },
-         cartCount: data.lineItems.length,
-        }
-      });
-    }
-  }
   render() {
     return (
       <Container style={styles.container}>
@@ -73,7 +55,7 @@ export default class CartScreen extends React.Component {
                     <Separator >
                       <Text></Text>
                     </Separator>
-                      {this.renderItems(data.cart)}
+                    <CartProducts products={data.cart.items} />
                     <Separator bordered>
                       <Text></Text>
                     </Separator>
@@ -101,116 +83,6 @@ export default class CartScreen extends React.Component {
     )
   }
 
-  renderItems(cart) {
-    let items = [];
-    cart.items.map((item, i) => {
-      items.push(
-        <ListItem
-          key={i}
-          last={cart.items.length === i+1}
-        >
-          <Thumbnail square style={styles.thumbnail} source={{ uri: item.product.imageUrl }} />
-          <Body style={{paddingLeft: 10}}>
-            <Text style={styles.quantity}>
-              {item.quantity > 1 ? item.quantity+ "x " : null}
-              {item.title}
-            </Text>
-            <Text style={styles.itemTitle}>{item.product.arName}</Text>
-            <Text style={styles.itemPrice}>{item.product.price} IQD</Text>
-          </Body>
-          <Right>
-            <Mutation 
-              mutation={CartAddProductMutation}
-              onCompleted={data => this._updateCartfromMutation(data.cartAddProduct.cart)}
-            >
-              {(cartAddProduct, { loading, error }) => {
-
-              
-                if (loading) {
-                  return(
-                    <Button style={{marginLeft: -10}} transparent >
-                      <ActivityIndicator size="small" color="#0000ff" style = {styles.activityIndicator} />
-                    </Button>
-                  )  
-
-                }
-                return (
-                  <Button style={styles.addButton} transparent onPress={() => 
-                    {
-                      cartAddProduct({
-                        variables: {
-                          productId: item.product.id,
-                        }
-                      })
-                    }
-                  }>
-                    <Icon active size={25} style={{fontSize: 25, color: '#2f95dc'}} name='md-add-circle' />
-                  </Button>
-                )
-              }}
-            </Mutation>
-            <Mutation
-              mutation={CartRemoveProductMutation}
-              onCompleted={data => this._updateCartfromMutation(data.cartRemoveProduct.cart)}
-            > 
-              {(cartRemoveProduct, { loading, error }) => {
-                if (loading) {
-                  return(
-                    <Button style={{marginLeft: -10}} transparent >
-                      <ActivityIndicator size="small" color="#0000ff" style = {styles.activityIndicator} />
-                    </Button>
-                  )  
-
-                }
-                return (
-                  <Button style={{marginLeft: -25}} transparent onPress={() => 
-                    {
-                      cartRemoveProduct({
-                        variables: {
-                          productId: item.product.id,
-                        }
-                      })
-                    }
-                  }>
-                    <Icon active size={25} style={{fontSize: 25, color: '#e6683c'}} name='md-remove-circle' />
-                  </Button>
-                )
-              }}
-            </Mutation>
-            <Mutation
-              mutation={CartDeleteProductMutation}
-              onCompleted={data => this._updateCartfromMutation(data.cartDeleteProduct.cart)}
-            > 
-              {(cartDeleteProduct, { loading, error }) => {
-                if (loading) {
-                  return(
-                    <Button style={{marginLeft: -10}} transparent >
-                      <ActivityIndicator size="small" color="#0000ff" style = {styles.activityIndicator} />
-                    </Button>
-                  )  
-
-                }
-                return (
-                  <Button style={{marginLeft: -25}} transparent onPress={() => 
-                    {
-                      cartDeleteProduct({
-                        variables: {
-                          productId: item.product.id,
-                        }
-                      })
-                    }
-                  }>
-                    <Icon active size={35} style={{color: '#e6683c'}} name='md-trash' />
-                  </Button>
-                )
-              }}
-            </Mutation>
-          </Right>
-        </ListItem>
-      );
-    });
-    return items;
-  }
 }
 
 const styles={

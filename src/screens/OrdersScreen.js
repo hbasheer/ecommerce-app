@@ -12,12 +12,8 @@ import { FlatGrid } from 'react-native-super-grid';
 
 import { Query } from "react-apollo";
 import { OrdersQuery} from ".././Query";
-
-const OrderStatus = {
-    "executing": ["قيد التنفيذ", "#0275d8"],
-    "completed": ["تم التسليم", "#5cb85c"],
-    "cancelled": ["ملغي", "#d9534f"]
-  }
+import OrderStatus from ".././constants/Helper";
+ 
 export default class OrdersScrren extends Component {
 
   constructor(props) {

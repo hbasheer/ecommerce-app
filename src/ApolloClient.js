@@ -36,6 +36,7 @@ client.query({query: GetCartQuery}).then(response => {
       items: response.data.getCart.lineItems
      },
      cartCount: response.data.getCart.lineItems.length,
+     cartItemIds: response.data.getCart.lineItems.map(item => item.product.id)
     }
   });
 });
