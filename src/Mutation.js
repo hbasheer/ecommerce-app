@@ -137,6 +137,37 @@ const CartDeleteProductMutation =gql`
 	}
 `
 
+const CreateOrderMutation =gql`
+	mutation createOrder($lat: Float!, $lng: Float!, $address: String!, $mobile: Int!, $detail: String!) {
+	  createOrder(attributes: {lat: $lat, lng: $lng, address: $address, mobile: $mobile, detail: $detail} ){
+		order{
+		  id
+		  price
+		  deliveryPrice
+		  totalPrice
+		  address
+		  status
+		  createdAt
+		  user {
+            fullname
+		  }
+		  items {
+		    price
+		    quantity
+		    product {
+	          id
+	          arName
+	          kuName
+	          price
+	          arDescription
+	          imageUrl
+		    }
+		  }
+		}
+	  }
+	}
+`
+
 export { 
 	SingInMutation, 
 	ResetPasswordMutation, 
@@ -144,5 +175,6 @@ export {
 	UpdateAccountMutation,
 	CartAddProductMutation,
 	CartRemoveProductMutation,
-	CartDeleteProductMutation
+	CartDeleteProductMutation,
+	CreateOrderMutation
 };

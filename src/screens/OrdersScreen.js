@@ -7,9 +7,7 @@ import {
   View
 } from 'react-native';
 import { Container, Header, Content, Grid, Row, Col, Text, Left, Body, Right, Button, Card, CardItem } from 'native-base';
-
 import { FlatGrid } from 'react-native-super-grid';
-
 import { Query } from "react-apollo";
 import { OrdersQuery} from ".././Query";
 import OrderStatus from ".././constants/Helper";

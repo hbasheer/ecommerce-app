@@ -62,7 +62,9 @@ export default class CartScreen extends React.Component {
                     <ListItem>
                       <Grid style={{marginTop: 20, marginBottom: 10}}>
                         <Col style={{paddingLeft: 10,paddingRight: 5}}>
-                          <Button onPress={() => this.checkout()} block iconLeft>
+                          <Button 
+                           onPress={() => this.props.navigation.navigate('NewOrder')} 
+                            block iconLeft>
                             <Icon active name='md-card' style={{marginRight: 10}} />
                             <Text style={{color: '#fff'}}> إنشاء طلب </Text>
                           </Button>

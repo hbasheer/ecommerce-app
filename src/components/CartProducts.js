@@ -6,7 +6,7 @@ import { Mutation } from "react-apollo";
 import {  CartAddProductMutation, CartRemoveProductMutation, CartDeleteProductMutation } from ".././Mutation"
 import client from '.././ApolloClient';
 
-export default class CartProducts extends React.Component {
+export default class CartProducts extends Component {
   _updateCartfromMutation = (data) => {
     if (data) {
       client.writeData({ data: 
