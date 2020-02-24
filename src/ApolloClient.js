@@ -1,31 +1,33 @@
-import { InMemoryCache } from 'apollo-cache-inmemory';
-import { HttpLink } from 'apollo-link-http';
+import { ApolloLink, from } from "apollo-link";
 import ApolloClient from 'apollo-client';
-import {AsyncStorage} from 'react-native';
-import { Query } from "react-apollo";
+import { HttpLink } from 'apollo-link-http';
+import { InMemoryCache } from 'apollo-cache-inmemory';
+import { AsyncStorage } from 'react-native';
+import { setContext } from "apollo-link-context";
+import { GetCartQuery } from "./Query";
 
-import { GetCartQuery } from "./Query"
-const token = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoxfSwiZXhwIjoxNTc3MDQxMDkzfQ.x5eG2wn38UNuk8eef7MF7zi8CDajYiyl542FZuWnuAs";
+const httpLink = new HttpLink({ uri: 'http://10.0.3.2:3000/api/graphql' });
 
-const httpLink = new HttpLink({ 
-	uri: 'http://10.0.3.2:3000/api/graphql',
-	headers: {
-	  authorization: token ? `Bearer ${token}` : ''
-	}
+const authMiddleware = setContext(async (req, { headers }) => {
+  const token = await AsyncStorage.getItem('TOKEN');
+  return {
+    headers: {
+      authorization: token ? `Bearer ${token}` : ''
+    },
+  };
 });
 
 const resolvers = {};
 
-//const token = AsyncStorage.getItem('TOKEN').then((token) => {console.log(token)})
 const cache = new InMemoryCache();
 const client = new ApolloClient({
-  link: httpLink,
+  link: from([authMiddleware, httpLink]),
   cache,
   resolvers
 });
 
 client.query({query: GetCartQuery}).then(response => {
-  cache.writeData({ data: 
+  client.writeData({ data: 
     {
      cart: {
       __typename: 'Cart',
@@ -39,7 +41,17 @@ client.query({query: GetCartQuery}).then(response => {
      cartItemIds: response.data.getCart.lineItems.map(item => item.product.id)
     }
   });
+  }).catch(err => {
+  client.writeData({ data: 
+    {
+     cart: {
+      __typename: 'Cart',
+      items: []
+     },
+     cartCount: 0,
+     cartItemIds: []
+    }
+  });
 });
-
 
 export default client;

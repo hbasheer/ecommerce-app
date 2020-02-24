@@ -3,7 +3,6 @@ import { Container, Body, Label, Content, View, Left, Right, Text, Button, Icon,
 import { TouchableOpacity, ActivityIndicator, AsyncStorage } from 'react-native';
 import { Mutation } from "react-apollo";
 import { SingInMutation } from "../../Mutation"
-
 // Our custom files and classes import
 import Colors from '../../constants/Colors';
 //import Text from '../../components/Text';
@@ -32,7 +31,7 @@ export default class Login extends Component {
 
   login = result => {
     AsyncStorage.setItem("TOKEN", result.data.signin.user.token)
-    this.props.navigation.navigate('HomeStack')
+    this.props.navigation.navigate('HomeStack');
   };
 
   render() {
@@ -113,7 +112,7 @@ export default class Login extends Component {
               <TouchableOpacity onPress={() => this.props.navigation.navigate('SignUp')}>
                 <Text style={styles.link}>حساب جديد</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => this.props.navigation.navigate('Home')}>
+              <TouchableOpacity onPress={() => this.props.navigation.navigate('ResetPassword')}>
                 <Text style={styles.link}>نسيت كلمة المرور ؟</Text>
               </TouchableOpacity>
             </View>
