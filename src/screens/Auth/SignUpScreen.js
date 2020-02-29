@@ -56,9 +56,8 @@ export default class Signup extends Component {
                     <CardItem>
                       <Body>
                         <Item floatingLabel>
-                            <Icon active name='md-mail' />
                             <Label>البريد الالكتروني</Label>
-                            <Input
+                            <Input style={styles.input}
                               text={this.state.email}
                               onChangeText={text => {
                                 this.setState({
@@ -66,15 +65,15 @@ export default class Signup extends Component {
                                 });
                               }}
                             />
+                            <Icon active name='md-mail' />
                         </Item>
                       </Body>
                     </CardItem>
                     <CardItem>
                       <Body>
                         <Item floatingLabel>
-                            <Icon active name='md-person' />
                             <Label>الاسم الكامل</Label>
-                            <Input
+                            <Input style={styles.input}
                               text={this.state.fullname}
                               onChangeText={text => {
                                 this.setState({
@@ -82,47 +81,15 @@ export default class Signup extends Component {
                                 });
                               }}
                             />
+                            <Icon active name='md-person' />
                         </Item>
                       </Body>
                     </CardItem>
                     <CardItem>
                       <Body>
                         <Item floatingLabel>
-                            <Icon active name='md-phone-portrait' />
-                            <Label>رقم الجوال</Label>
-                            <Input
-                              text={this.state.mobile}
-                              onChangeText={text => {
-                                this.setState({
-                                  mobile: text
-                                });
-                              }}
-                            />
-                        </Item>
-                      </Body>
-                    </CardItem>
-                    <CardItem>
-                      <Body>
-                        <Item floatingLabel>
-                            <Icon active name='md-phone-portrait' />
-                            <Label>العنوان</Label>
-                            <Input
-                              text={this.state.address}
-                              onChangeText={text => {
-                                this.setState({
-                                  address: text
-                                });
-                              }}
-                            />
-                        </Item>
-                      </Body>
-                    </CardItem>
-                    <CardItem>
-                      <Body>
-                        <Item floatingLabel>
-                            <Icon active name='md-lock' />
                             <Label>كلمة المرور</Label>
-                            <Input
+                            <Input style={styles.input}
                               secureTextEntry={true}
                               text={this.state.password}
                               onChangeText={text => {
@@ -131,15 +98,15 @@ export default class Signup extends Component {
                                 });
                               }}
                             />
+                            <Icon active name='md-lock' />
                         </Item>
                       </Body>
                     </CardItem>
                     <CardItem>
                       <Body>
                         <Item floatingLabel>
-                            <Icon active name='md-lock' />
                             <Label>تأكيد كلمة المرور</Label>
-                            <Input
+                            <Input style={styles.input}
                               secureTextEntry={true}
                               text={this.state.rePassword}
                               onChangeText={text => {
@@ -148,6 +115,7 @@ export default class Signup extends Component {
                                 });
                               }}
                             />
+                            <Icon active name='md-lock' />
                         </Item>
                       </Body>
                     </CardItem>
@@ -176,13 +144,9 @@ export default class Signup extends Component {
                       .catch(err => this.setState({hasError: true, errors: err.graphQLErrors}))
                     }
                     
-                  } style={{ marginTop: 20}}>
+                  } style={styles.button}>
                     <Icon active name='md-log-in' right />
                     <Text>سجل دخول</Text>
-                  </Button>
-                  <Button block onPress={() => this.signup()} style={{ marginTop: 20 }}>
-                    <Icon active name='logo-facebook' />
-                    <Text>سجل عبر الفيسبوك</Text>
                   </Button>
                 </View>
               </Content>
@@ -214,7 +178,6 @@ export default class Signup extends Component {
       this.setState({hasError: true, errorText: 'كلمة المرور غير متطابقة'});
       return;
     }
-
   }
 
   verifyEmail(email) {
@@ -255,13 +218,15 @@ const styles= {
     marginTop: 20
   },
   button: {
-   backgroundColor: Colors.navbarBackgroundColor,
    marginTop: 20, 
    backgroundColor: '#2f95dc'
  },
  link: {
   marginBottom: 10, 
   color: '#2f95dc'
+ },
+ input: {
+  textAlign: 'right',
  }
 
 };

@@ -1,78 +1,65 @@
-import React from 'react';
+import * as React from 'react';
 import { Platform, StatusBar, StyleSheet, View, I18nManager } from 'react-native';
-import { AppLoading, Asset, Font, Icon } from 'expo';
+import { SplashScreen } from 'expo';
+import * as Font from 'expo-font';
+import { Ionicons } from '@expo/vector-icons';
+import { AppLoading } from 'expo';
+import { Asset } from 'expo-asset';
 import AppNavigator from './src/navigation/AppNavigator';
 import { ApolloProvider } from 'react-apollo';
 import client from './src/ApolloClient';
 
 I18nManager.forceRTL(true);
 
-export default class App extends React.Component {
-  constructor(props){
-    super(props);
-    this.state = {
-      isLoadingComplete: false,
+export default function App(props) {
+  const [isLoadingComplete, setLoadingComplete] = React.useState(false);
+
+  // Load any resources or data that we need prior to rendering the app
+  React.useEffect(() => {
+    async function loadResourcesAndDataAsync() {
+      try {
+        SplashScreen.preventAutoHide();
+
+
+        // Load fonts
+        await Font.loadAsync({
+          ...Ionicons.font,
+          'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
+          'Roboto': require("./node_modules/native-base/Fonts/Roboto.ttf"),
+          'Roboto_medium': require("./node_modules/native-base/Fonts/Roboto_medium.ttf"),
+        });
+      } catch (e) {
+        // We might want to provide this error information to an error reporting service
+        console.warn(e);
+      } finally {
+        setLoadingComplete(true);
+        SplashScreen.hide();
+      }
     }
+
+    loadResourcesAndDataAsync();
+  }, []);
+
+  if (!isLoadingComplete && !props.skipLoadingScreen) {
+    return (
+      <AppLoading
+        startAsync={this._loadResourcesAsync}
+        onError={this._handleLoadingError}
+        onFinish={this._handleFinishLoading}
+      />
+    );
+  } else {
+    return (
+      <ApolloProvider client={client}>
+        <View style={styles.container}>
+          {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+           <AppNavigator />
+        </View>
+      </ApolloProvider>
+    );
   }
-  componentWillMount() {
-    this.loadFonts();
-  }
-
-  async loadFonts() {
-    await Expo.Font.loadAsync({
-      Roboto: require("./node_modules/native-base/Fonts/Roboto.ttf"),
-      Roboto_medium: require("./node_modules/native-base/Fonts/Roboto_medium.ttf"),
-    });
-  }
-
-  render() {
-    if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
-      console.log(this.state.islogin)
-      return (
-        <AppLoading
-          startAsync={this._loadResourcesAsync}
-          onError={this._handleLoadingError}
-          onFinish={this._handleFinishLoading}
-        />
-      );
-    } else {
-      return (
-        <ApolloProvider client={client}>
-          <View style={styles.container}>
-            {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-             <AppNavigator />
-          </View>
-        </ApolloProvider>
-      );
-    }
-  }
-
-  _loadResourcesAsync = async () => {
-    return Promise.all([
-      Asset.loadAsync([
-        require('./assets/images/robot-dev.png'),
-        require('./assets/images/robot-prod.png'),
-      ]),
-      Font.loadAsync({
-        // This is the font that we are using for our tab bar
-        ...Icon.Ionicons.font,
-        'Roboto': require("./node_modules/native-base/Fonts/Roboto.ttf"),
-        'Roboto_medium': require("./node_modules/native-base/Fonts/Roboto_medium.ttf"),
-        'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
-      }),
-    ]);
-  };
-
-  _handleLoadingError = error => {
-    // In this case, you might want to report the error to your error
-    // reporting service, for example Sentry
-    console.warn(error);
-  };
-
-  _handleFinishLoading = () => {
-    this.setState({ isLoadingComplete: true });
-  };
 }
+
 
 const styles = StyleSheet.create({
   container: {

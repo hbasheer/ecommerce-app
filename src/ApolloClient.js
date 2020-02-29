@@ -1,6 +1,7 @@
 import { ApolloLink, from } from "apollo-link";
 import ApolloClient from 'apollo-client';
 import { HttpLink } from 'apollo-link-http';
+import { onError } from 'apollo-link-error';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { AsyncStorage } from 'react-native';
 import { setContext } from "apollo-link-context";
@@ -17,11 +18,24 @@ const authMiddleware = setContext(async (req, { headers }) => {
   };
 });
 
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors) {
+    graphQLErrors.map(({ message, locations, path }) =>
+      // eslint-disable-next-line no-console
+      console.log(
+        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
+      ),
+    );
+  }
+  // eslint-disable-next-line no-console
+  if (networkError) console.log(`[Network error]: ${networkError}`);
+});
+
 const resolvers = {};
 
 const cache = new InMemoryCache();
 const client = new ApolloClient({
-  link: from([authMiddleware, httpLink]),
+  link: from([errorLink, authMiddleware, httpLink]),
   cache,
   resolvers
 });

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Content, View, Left, Right, Text, Button, Icon, Item, Input } from 'native-base';
+import { Container, Content, View, Body, Label, Text, Button, Icon, CardItem, Item, Input, Form } from 'native-base';
 import { TouchableOpacity, ActivityIndicator, AsyncStorage } from 'react-native';
 import { Mutation } from "react-apollo";
 import { ResetPasswordMutation } from "../../Mutation"
@@ -41,14 +41,22 @@ export default class ResetPassword extends Component {
         <Container style={styles.container}>
           <Content contentContainerStyle={styles.content}>
             <View style={styles.intro}>
-              <Text style={styles.title}> أهلا بك </Text>
-              <Text style={styles.details}>ادخل بريدرك الالكترومي لنرسل لك تعليمات استعادة كلمة المرور </Text>
+              <Text style={styles.details}>ادخل بريدك الالكتروني لنرسل لك تعليمات الاستعادة </Text>
             </View>
-            <Item>
-                <Input placeholder='البريد الالكتروني' onChangeText={(text) => this.setState({email: text})} placeholderTextColor="#687373" />
-                <Icon active name='ios-person' style={styles.icon}  />
-            </Item>
-
+              <Form>
+                <CardItem>
+                  <Body>
+                    <Item floatingLabel>
+                        <Label>البريد الالكتروني</Label>
+                        <Input style={styles.input}
+                          text={this.state.email}
+                          onChangeText={(text) => this.setState({email: text})}
+                        />
+                        <Icon active name='md-mail' />
+                    </Item>
+                  </Body>
+                </CardItem>
+              </Form>
             { this.state.info &&  !loading ? <Text style={{color: "#006621", textAlign: 'center', marginTop: 10}}>{this.state.info}</Text>
               :null
             }
@@ -91,10 +99,7 @@ export default class ResetPassword extends Component {
     </Mutation>
     );
   }
-
 }
-
-
 
 const styles= {
   container: {
@@ -134,6 +139,10 @@ const styles= {
  link: {
   marginBottom: 10, 
   color: '#2f95dc'
+},
+ input: {
+  textAlign: 'right',
 }
+
 
 };

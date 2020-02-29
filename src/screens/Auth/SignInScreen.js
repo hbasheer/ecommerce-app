@@ -48,9 +48,8 @@ export default class Login extends Component {
                 <CardItem>
                   <Body>
                     <Item floatingLabel>
-                        <Icon active name='md-mail' />
                         <Label>البريد الالكتروني</Label>
-                        <Input
+                        <Input style={styles.input}
                           text={this.state.email}
                           onChangeText={text => {
                             this.setState({
@@ -58,15 +57,15 @@ export default class Login extends Component {
                             });
                           }}
                         />
+                        <Icon active name='md-mail' />
                     </Item>
                   </Body>
                 </CardItem>
                 <CardItem>
                   <Body>
                     <Item floatingLabel>
-                        <Icon active name='ios-lock' />
                         <Label>كلمة المرور</Label>
-                        <Input
+                        <Input style={styles.input}
                           secureTextEntry={true}
                           text={this.state.password}
                           onChangeText={text => {
@@ -75,6 +74,7 @@ export default class Login extends Component {
                             });
                           }}
                         />
+                        <Icon active name='ios-lock' />
                     </Item>
                   </Body>
                 </CardItem>
@@ -82,6 +82,7 @@ export default class Login extends Component {
             {this.state.hasError && this.state.errors &&  !loading? this.state.errors.map(({ message }, i) => (<Text key={i} style={{color: "#c0392b", textAlign: 'center', marginTop: 10}}>{message}</Text>))
               :null
             }
+            { error && error.networkError && <Text style={{color: "#c0392b", textAlign: 'center', marginTop: 10}}>{error.networkError.message}</Text> }
             { loading && 
               <View style={styles.marginTop}>
                 <ActivityIndicator size="large" color="#0000ff"  />
@@ -100,13 +101,10 @@ export default class Login extends Component {
                 }
 
               } style={styles.button}>
-                <Icon active name='md-log-in' right />
+                <Icon active name='md-log-in' left />
                 <Text>سجل دخول</Text>
               </Button>
-              <Button block style={{ marginTop: 20}}>
-                <Icon active name='logo-facebook' />
-                <Text>سجل عبر الفيسبوك</Text>
-              </Button>
+
             </View>
             <View style={styles.marginTop}>
               <TouchableOpacity onPress={() => this.props.navigation.navigate('SignUp')}>
@@ -158,10 +156,13 @@ const styles= {
   },
   button: {
    marginTop: 20, 
+   backgroundColor: '#2f95dc'
  },
  link: {
   marginBottom: 10, 
   color: '#2f95dc'
+ },
+ input: {
+  textAlign: 'right',
  }
-
 };
